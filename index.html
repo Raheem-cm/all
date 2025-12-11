@@ -1,0 +1,391 @@
+ <!DOCTYPE html>
+<html lang="sw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAHEEM-XMD-3 | WhatsApp Bot Pairing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    <style>
+        :root {
+            --primary: #075e54;
+            --secondary: #128c7e;
+            --accent: #25d366;
+            --dark: #0d1b2a;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #1b263b 100%);
+            color: var(--light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .raheem-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s;
+        }
+        
+        .raheem-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .session-id {
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--accent);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px dashed var(--accent);
+        }
+        
+        .btn-raheem {
+            background: linear-gradient(90deg, var(--accent), #1da851);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 12px 30px;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        
+        .btn-raheem:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg, var(--primary), var(--secondary));">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fab fa-whatsapp"></i> RAHEEM <span class="text-warning">XMD-3</span>
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a href="admin.html" class="btn btn-outline-light btn-sm">
+                    <i class="fas fa-lock"></i> Admin
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 fw-bold">
+                        <span class="text-warning">RAHEEM</span>-XMD-3 Bot
+                    </h1>
+                    <p class="lead">Pata Session ID na QR Code ya kuunganisha WhatsApp yako</p>
+                </div>
+                
+                <!-- Session ID Generator -->
+                <div class="raheem-card p-4 mb-4">
+                    <h3><i class="fas fa-key text-warning"></i> Tengeneza Session ID</h3>
+                    <p class="text-muted">Weka nambari yako ya WhatsApp kupata session ID</p>
+                    
+                    <form id="sessionForm">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="countryCode">
+                                    <option value="255">TZ (+255)</option>
+                                    <option value="254">KE (+254)</option>
+                                    <option value="256">UG (+256)</option>
+                                    <option value="1">US (+1)</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <input type="tel" class="form-control" id="phoneNumber" 
+                                       placeholder="762 345 678" pattern="[0-9]{9}" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-raheem w-100 mt-4" id="generateBtn">
+                            <i class="fas fa-bolt"></i> TENGENEZA SESSION ID
+                        </button>
+                    </form>
+                    
+                    <!-- Result Display -->
+                    <div class="mt-4" id="resultSection" style="display: none;">
+                        <h4 class="text-success">
+                            <i class="fas fa-check-circle"></i> Session ID Imetengenezwa!
+                        </h4>
+                        
+                        <div class="session-id mt-3 mb-3 text-center" id="sessionIdDisplay">
+                            <!-- Session ID itaonekana hapa -->
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            <strong>Maelekezo:</strong> Tumia session ID hii kwenye bot ya WhatsApp.
+                            Tuma <code>#pair [SESSION_ID]</code> kwa nambari ya bot.
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-light flex-fill" onclick="copySessionId()">
+                                <i class="fas fa-copy"></i> Nakili Session ID
+                            </button>
+                            <button class="btn btn-outline-warning flex-fill" onclick="sendViaWhatsApp()">
+                                <i class="fab fa-whatsapp"></i> Tuma kwa WhatsApp
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-clock"></i> Session ID hii itaisha baada ya <strong>saa 24</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- QR Code Section -->
+                <div class="raheem-card p-4">
+                    <h3><i class="fas fa-qrcode text-warning"></i> QR Code ya Moja kwa Moja</h3>
+                    <p class="text-muted">Scan QR code hii kwa WhatsApp yako kuunganisha kiotomatiki</p>
+                    
+                    <div class="text-center">
+                        <div id="qrContainer" class="mb-4">
+                            <img src="" alt="QR Code" id="qrCodeImage" class="img-fluid" 
+                                 style="max-width: 250px; border: 10px solid white; border-radius: 10px;">
+                        </div>
+                        
+                        <div class="d-flex justify-content-center gap-2">
+                            <button class="btn-raheem" onclick="generateNewQR()">
+                                <i class="fas fa-sync-alt"></i> QR Mpya
+                            </button>
+                            <button class="btn btn-outline-light" onclick="downloadQR()">
+                                <i class="fas fa-download"></i> Pakua
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="row mt-4 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="raheem-card p-3">
+                            <h3 class="text-warning" id="totalSessions">0</h3>
+                            <small>Sessions</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="raheem-card p-3">
+                            <h3 class="text-success" id="activeSessions">0</h3>
+                            <small>Aktivu</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="raheem-card p-3">
+                            <h3 class="text-info" id="totalQR">0</h3>
+                            <small>QR Codes</small>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="raheem-card p-3">
+                            <h3 class="text-primary" id="successRate">0%</h3>
+                            <small>Mafanikio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-5 py-4 border-top border-secondary">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fab fa-whatsapp"></i> RAHEEM-XMD-3</h5>
+                    <p class="text-muted">WhatsApp Bot Pairing System</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">
+                        <i class="fas fa-phone"></i> +255 763 111 390 |
+                        <i class="fas fa-code"></i> Toleo 3.0.0
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            generateInitialQR();
+        });
+        
+        // Form submission
+        document.getElementById('sessionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await generateSessionId();
+        });
+        
+        async function generateSessionId() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (!phoneNumber || phoneNumber.length < 9) {
+                alert('Tafadhali weka nambari sahihi');
+                return;
+            }
+            
+            // Disable button
+            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> INAUNDWA...';
+            generateBtn.disabled = true;
+            
+            try {
+                // In production, call your API
+                // const response = await fetch('/api/generate.php', {...});
+                
+                // For demo, generate locally
+                const sessionId = await generateDemoSessionId(phoneNumber);
+                
+                // Display result
+                document.getElementById('sessionIdDisplay').textContent = sessionId;
+                document.getElementById('resultSection').style.display = 'block';
+                
+                // Update stats
+                updateStatistics();
+                
+                // Scroll to result
+                document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hitilafu imetokea. Tafadhali jaribu tena.');
+            } finally {
+                // Reset button
+                generateBtn.innerHTML = '<i class="fas fa-bolt"></i> TENGENEZA SESSION ID';
+                generateBtn.disabled = false;
+            }
+        }
+        
+        async function generateDemoSessionId(phone) {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Generate short session ID starting with "Raheem~"
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No ambiguous chars
+            let shortId = '';
+            for (let i = 0; i < 6; i++) {
+                shortId += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            return `Raheem~${shortId}`;
+        }
+        
+        function copySessionId() {
+            const sessionId = document.getElementById('sessionIdDisplay').textContent;
+            navigator.clipboard.writeText(sessionId).then(() => {
+                alert('Session ID imenakiliwa!');
+            });
+        }
+        
+        function sendViaWhatsApp() {
+            const sessionId = document.getElementById('sessionIdDisplay').textContent;
+            const phone = document.getElementById('phoneNumber').value;
+            const message = `Jambo! Tumia session ID hii kuunganisha na RAHEEM-XMD-3 bot:\n\n${sessionId}\n\nTuma #pair ${sessionId} kwa bot.`;
+            const url = `https://wa.me/255${phone}?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+        
+        function generateNewQR() {
+            const qrImage = document.getElementById('qrCodeImage');
+            const randomCode = 'Raheem~' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(randomCode)}&format=png&color=075e54&bgcolor=ffffff`;
+            updateQRCount();
+        }
+        
+        function generateInitialQR() {
+            const qrImage = document.getElementById('qrCodeImage');
+            const defaultCode = 'Raheem~INITIAL';
+            qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(defaultCode)}`;
+        }
+        
+        function downloadQR() {
+            const qrImage = document.getElementById('qrCodeImage').src;
+            const link = document.createElement('a');
+            link.href = qrImage;
+            link.download = `Raheem-QR-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function loadStatistics() {
+            // Load from localStorage or API
+            const stats = JSON.parse(localStorage.getItem('raheem_stats')) || {
+                totalSessions: 142,
+                activeSessions: 89,
+                totalQR: 56,
+                successRate: '94%'
+            };
+            
+            document.getElementById('totalSessions').textContent = stats.totalSessions;
+            document.getElementById('activeSessions').textContent = stats.activeSessions;
+            document.getElementById('totalQR').textContent = stats.totalQR;
+            document.getElementById('successRate').textContent = stats.successRate;
+        }
+        
+        function updateStatistics() {
+            const stats = JSON.parse(localStorage.getItem('raheem_stats')) || {
+                totalSessions: 142,
+                activeSessions: 89,
+                totalQR: 56,
+                successRate: '94%'
+            };
+            
+            stats.totalSessions++;
+            stats.activeSessions++;
+            
+            // Update success rate
+            const successNum = parseInt(stats.successRate);
+            if (successNum < 100) {
+                stats.successRate = (successNum + 0.1).toFixed(1) + '%';
+            }
+            
+            localStorage.setItem('raheem_stats', JSON.stringify(stats));
+            loadStatistics();
+        }
+        
+        function updateQRCount() {
+            const stats = JSON.parse(localStorage.getItem('raheem_stats')) || {
+                totalSessions: 142,
+                activeSessions: 89,
+                totalQR: 56,
+                successRate: '94%'
+            };
+            
+            stats.totalQR++;
+            localStorage.setItem('raheem_stats', JSON.stringify(stats));
+            loadStatistics();
+        }
+    </script>
+</body>
+</html>
